@@ -1,0 +1,153 @@
+ArcXP Senior Software Developer - Essential Patterns & Best Practices
+
+1. Environment Setup
+
+1.1. Prerequisites
+- Node.js Version: 18.17.1 (required by ARC XP)
+- Package Management: npm or yarn (be consistent)
+- Required Repositories:
+  - Arc Themes Blocks Repository (for UI components)
+  - Outbound Feeds Blocks Repository (for feed integrations)
+
+2. Project Structure
+
+2.1. Directory Structure
+```
+project/
+├── components/
+│   └── features/           # Feature components with default.jsx
+├── content/
+│   └── sources/           # Content source files
+└── environment/           # Environment configurations
+```
+
+2.2. File Naming
+- Feature Components: `default.jsx` (NOT index.jsx)
+- Content Sources: descriptive.js (e.g., weather.js)
+- Style Files: feature-name.scss
+
+3. Content Sources (Most Critical)
+
+3.1. Core Pattern
+```javascript
+import { API_KEY } from 'fusion:environment'
+
+const resolve = (query) => {
+  const requestUri = `http://api.example.com/data?apikey=${API_KEY}`
+
+  if (query.hasOwnProperty('paramName')) {
+    return `${requestUri}&param=${query.paramName}`
+  }
+
+  throw new Error('content source requires paramName')
+}
+
+export default {
+  resolve,
+  schemaName: 'schemaName',
+  params: {
+    paramName: 'text'
+  }
+}
+```
+
+3.2. Critical Rules
+✅ DO:
+- Return ONLY the URI string from resolve()
+- Use fusion:environment for API keys
+- Use http:// in development for certificate issues
+- Keep parameter names descriptive
+- Throw errors for missing required params
+
+❌ DON'T:
+- Use axios or other HTTP libraries
+- Transform API responses
+- Handle HTTP requests manually
+- Implement custom error handling
+- Use process.env
+
+4. Feature Components
+
+4.1. Core Pattern
+```javascript
+import React from 'react';
+import PropTypes from 'prop-types';
+import { useContent } from 'fusion:content';
+
+const FeatureComponent = ({ customFields }) => {
+  const { paramName = 'default' } = customFields;
+  
+  const data = useContent({
+    source: 'sourceName',
+    query: { paramName }
+  });
+
+  if (!data) return <LoadingState />;
+
+  return <YourComponent data={data} />;
+};
+
+FeatureComponent.propTypes = {
+  customFields: PropTypes.shape({
+    paramName: PropTypes.string
+  })
+};
+
+export default FeatureComponent;
+```
+
+4.2. Critical Rules
+✅ DO:
+- Use default.jsx for feature components
+- Keep components focused on rendering
+- Use proper PropTypes
+- Let content system handle data fetching
+
+❌ DON'T:
+- Use index.jsx
+- Mix content fetching with rendering logic
+- Implement custom HTTP requests
+- Transform API data in components
+
+5. Environment Configuration
+
+5.1. Pattern
+```json
+{
+  "API_KEY": "your-key-here",
+  "OTHER_CONFIG": "value"
+}
+```
+
+5.2. Critical Rules
+✅ DO:
+- Use fusion:environment for all environment variables
+- Keep sensitive data in environment files
+- Use proper environment separation
+
+❌ DON'T:
+- Hardcode API keys
+- Use process.env
+- Expose sensitive data in code
+
+6. Common Pitfalls & Solutions
+
+6.1. SSL Certificate Issues
+- Use http:// instead of https:// in development
+- Let ARC XP handle certificate management
+
+6.2. Component Location
+- Always place features under components/features/
+- Use proper file naming (default.jsx)
+
+6.3. Data Fetching
+- Always use useContent hook
+- Let ARC XP handle the actual HTTP requests
+- Don't transform data in content sources
+
+7. Resources
+🔗 Arc XP Developer Portal: https://dev.arcxp.com/
+🔗 Arc XP Learning Center: https://docs.arcxp.com/
+🔗 Arc Themes Blocks: https://github.com/WPMedia/arc-themes-blocks
+
+Remember: Always follow ARC XP patterns exactly as documented. Simpler is better.
