@@ -63,11 +63,6 @@ Other platform areas beyond PageBuilder:
 
 ## PageBuilder Engine Documentation — Full Reference
 
-<!-- TOKEN EFFICIENCY: To keep this file compact, doc links below use relative
-     paths under a base URL. Prepend the base to any relative path to get the
-     full URL. Where a slug alone doesn't convey the topic, a parenthetical
-     description is added. -->
-
 **Developer docs base URL:** `https://dev.arcxp.com/pagebuilder-engine/developer-docs/`
 
 Append each path below to the base URL above.
